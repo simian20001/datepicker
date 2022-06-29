@@ -6,8 +6,12 @@
     template.innerHTML = `
     <style>
     .arrowbox {
+        display: inline-block;
+        min-width: 50px;
+        text-align: center;
         padding: 8px;
         border: 1px solid red;
+        vertical-align: middle;
         font-size: 40px;
     }
     </style>

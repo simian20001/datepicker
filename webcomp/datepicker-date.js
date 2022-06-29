@@ -6,11 +6,14 @@
     template.innerHTML = `
     <style>
     .datebox {
+        display: inline-block;
         width: 100px;
         padding: 8px;
+        text-align: center;
+        vertical-align: middle;
         border: 1px solid black;
     }
-    
+
     .day {
         font-size: 40px;
         font-weight: bold;
@@ -49,18 +52,6 @@
         set currentWeek(newVal){
             console.log('setter fired');
             this._props.week = newVal;
-            this.render();
-        }
-        
-        // Listen for changes in these tagAttr
-        static get observedAttributes() {
-            return ['week'];
-        }
-
-        attributeChangedCallback(name, oldVal, newVal) {
-            // If Property is flagged as having a setter then just update the shadow property
-            if ( Object.keys(this._props).indexOf(name) == -1 ) this[name] = newVal;
-            else this._props[name] = newVal;
             this.render();
         }
         

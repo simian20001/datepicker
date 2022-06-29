@@ -29,13 +29,13 @@
     
     <!-- Layout Definition -->
     <div class="grid-container">
-    <div class="g-item"><dp-arrow id="al"></dp-arrow></div>
-    <div class="g-item"><dp-date id="1"></dp-date></div>
-    <div class="g-item"><dp-date id="2"></dp-date></div>
-    <div class="g-item"><dp-date id="3"></dp-date></div>
-    <div class="g-item"><dp-date id="4"></dp-date></div>
-    <div class="g-item"><dp-date id="5"></dp-date></div>
-    <div class="g-item"><dp-arrow id="ar"></dp-arrow></div>
+    <dp-arrow id="al"></dp-arrow>
+    <dp-date id="1"></dp-date>
+    <dp-date id="2"></dp-date>
+    <dp-date id="3"></dp-date>
+    <dp-date id="4"></dp-date>
+    <dp-date id="5"></dp-date>
+    <dp-arrow id="ar"></dp-arrow>
     </div>`
     
     customElements.define('date-picker',
@@ -43,36 +43,39 @@
         constructor() {
             super()
             this.loadSubs();
-            this.attachShadow({ mode: 'open' }).append(template.content.cloneNode(true));
-            console.log('appended ');
             setTimeout(() => {
-                
-                this._props = {}; // Object to hold shadow properties for properties with setters
-                this.week = '0';
-                
-                // Get button nodes
-                this.$buttonL = this.shadowRoot.querySelector("#al");
-                this.$buttonR = this.shadowRoot.querySelector("#ar");
-                
-                // Initalise left button to grey
-                this.$buttonL.style.color='#CCCCCC';
-                
-                // Add onClick events
-                this.$buttonL.addEventListener('click', () => {
-                    let week = parseInt(this.week);
-                    if ( week > 0) {
-                        week -= 1;
-                        this.week = String(week);
-                        if (week == 0) this.$buttonL.style.color='#CCCCCC';
-                    }
-                })
-                this.$buttonR.addEventListener('click', () => {
-                    let week = parseInt(this.week);
-                    week += 1;
-                    this.week = String(week);
-                    this.$buttonL.style.color='#000000';
+                this.attachShadow({ mode: 'open' }).append(template.content.cloneNode(true));
+                // Ensure the above has completed before continuing
+                setTimeout(() => {
                     
-                })
+                    this._props = {}; // Object to hold shadow properties for properties with setters
+                    this.week = '0';
+                    
+                    // Get button nodes
+                    this.$buttonL = this.shadowRoot.querySelector("#al");
+                    this.$buttonR = this.shadowRoot.querySelector("#ar");
+                    
+                    // Initalise left button to grey
+                    this.$buttonL.style.color='#CCCCCC';
+                    
+                    // Add onClick events
+                    this.$buttonL.addEventListener('click', () => {
+                        let week = parseInt(this.week);
+                        if ( week > 0) {
+                            week -= 1;
+                            this.week = String(week);
+                            if (week == 0) this.$buttonL.style.color='#CCCCCC';
+                        }
+                    });
+                    this.$buttonR.addEventListener('click', () => {
+                        let week = parseInt(this.week);
+                        week += 1;
+                        this.week = String(week);
+                        this.$buttonL.style.color='#000000';
+                        
+                    });
+                });
+    
             });
         }
         
@@ -102,14 +105,9 @@
                 // If Property is flagged as having a setter then just update the shadow property
                 if ( Object.keys(this._props).indexOf(name) !== -1 ) this._props[name] = newVal;
                 else this[name] = newVal;
-                this.render();
             }
         }
-        
-        render (){
-            console.log('date-picker rendered')
-        }
-        
+                
         loadSubs (){
             // ### Load sub-components ###
             // Determine URL where sub-components can be found (assumes they live with main component)

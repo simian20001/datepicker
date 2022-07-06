@@ -9,7 +9,7 @@
     template.innerHTML = `
     <!-- Style Definition -->
     <style>
-    .grid-container {
+    #container {
         display: inline-block;
         font-family: Candara, Calibri, Segoe, Segoe UI, Optima, Arial, sans-serif;
         border-style: solid;
@@ -28,7 +28,7 @@
     </style>
     
     <!-- Layout Definition -->
-    <div class="grid-container">
+    <div id="container">
     <dp-arrow id="al"></dp-arrow>
     <dp-date id="1"></dp-date>
     <dp-date id="2"></dp-date>
@@ -42,6 +42,7 @@
     class extends HTMLElement {
         constructor() {
             super()
+            // Synchonously load dependencies.  Rest of contructor now in buildComp()
             this.loadSubs();
         }
         
@@ -55,20 +56,6 @@
             this.shadowRoot.querySelectorAll('dp-date').forEach(node => {
                 node.currentWeek=parseInt(newVal);
             });
-        }
-        
-        // Listen for changes in these tagAttr
-        static get observedAttributes() {
-            return ['week'];
-        }
-        
-        attributeChangedCallback(name, oldVal, newVal) {
-            // Check for spurious callback
-            if (oldVal !== newVal) {
-                // If Property is flagged as having a setter then just update the shadow property
-                if ( Object.keys(this._props).indexOf(name) !== -1 ) this._props[name] = newVal;
-                else this[name] = newVal;
-            }
         }
         
         // Synchronously load all dependencies (add to document head) then build component
@@ -114,29 +101,33 @@
             this.attachShadow({ mode: 'open' }).append(template.content.cloneNode(true));
             this._props = {}; // Object to hold shadow properties for properties with setters
             this.week = '0';
-            
-            // Get button nodes
-            this.$buttonL = this.shadowRoot.querySelector("#al");
-            this.$buttonR = this.shadowRoot.querySelector("#ar");
-            
-            // Initalise left button to grey
-            this.$buttonL.style.color='#CCCCCC';
-            
+
+            // Define custom events            
+            const decWeek = new CustomEvent('changeWeek',{detail: {change: -1}});//,bubble: true}});
+            const incWeek = new CustomEvent('changeWeek',{detail: {change: 1}});
+                        
+            // Set useful nodes
+            const $eventBus = this.shadowRoot.querySelector('#container')
+            const $buttonL = this.shadowRoot.querySelector('#al');
+            const $buttonR = this.shadowRoot.querySelector('#ar');
+
+            // Debug event
+            //$eventBus.addEventListener('changeWeek',(e)=>console.log(e.detail.change));
+
             // Add onClick events
-            this.$buttonL.addEventListener('click', () => {
+            $buttonL.addEventListener('click', () => {
+                $eventBus.dispatchEvent(decWeek);
                 let week = parseInt(this.week);
                 if ( week > 0) {
                     week -= 1;
                     this.week = String(week);
-                    if (week == 0) this.$buttonL.style.color='#CCCCCC';
                 }
             });
-            this.$buttonR.addEventListener('click', () => {
+            $buttonR.addEventListener('click', () => {
+                $eventBus.dispatchEvent(incWeek);
                 let week = parseInt(this.week);
                 week += 1;
-                this.week = String(week);
-                this.$buttonL.style.color='#000000';
-                
+                this.week = String(week);                
             });
         }
         

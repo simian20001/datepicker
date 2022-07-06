@@ -22,10 +22,26 @@
     class extends HTMLElement {
         constructor() {
             super().append(template.content.cloneNode(true));
-            // Object to hold shadow properties for properties with setters
-            
+        }
+        
+        connectedCallback() {
+            // Set arrow text           
             this.querySelector('.arrowbox').innerHTML = `&nbsp;${this.id === 'al'?'&lt;':'&gt;'}&nbsp;`;
-        }        
+            // Set initial colour
+            this.week=0
+            this.render();
+            this.parentNode.addEventListener('changeWeek', (e) => {
+                this.week += e.detail.change;
+                if (this.week < 0) this.week = 0;
+                this.render();
+            }
+            );
+        }
+        
+        render() {
+            this.style.color = (this.id === 'al' && this.week === 0) ? '#CCCCCC' : '#000000';
+        }
+        
         
     });
 }) ();

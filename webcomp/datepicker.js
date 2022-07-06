@@ -77,24 +77,17 @@
                 const file = scripts.shift();
                 const tagAttr = {
                     src: `${baseURL}/${file}.js?`,
-                    //type: '',
                     onerror: () => {
                         console.warn(`script load error: ${file}`);
-                    }
-                }
-
-                if (scripts.length) {
-                    // If there are more scripts then run this function again after current dependancy has loaded
-                    tagAttr.onload = () => {
-                        console.log(`script dependency loaded: ${file}`);
+                    },
+                    onload: () => {
                         this.loadSub(scripts,baseURL);
                     }
-                } else {
-                    // If this is the last dependancy then schedule building of the component once depency loaded
-                    tagAttr.onload = () => {
-                        console.log(`script dependency loaded: ${file}`);
-                        this.buildComp();
-                    }
+                }
+                // Is this the last dependency?
+                if (!scripts.length) {
+                    // Build component after this
+                    tagAttr.onload = () => this.buildComp();
                 }
                 document.head.append(Object.assign(document.createElement('script'),tagAttr));    
             }

@@ -43,40 +43,6 @@
         constructor() {
             super()
             this.loadSubs();
-            setTimeout(() => {
-                this.attachShadow({ mode: 'open' }).append(template.content.cloneNode(true));
-                // Ensure the above has completed before continuing
-                setTimeout(() => {
-                    
-                    this._props = {}; // Object to hold shadow properties for properties with setters
-                    this.week = '0';
-                    
-                    // Get button nodes
-                    this.$buttonL = this.shadowRoot.querySelector("#al");
-                    this.$buttonR = this.shadowRoot.querySelector("#ar");
-                    
-                    // Initalise left button to grey
-                    this.$buttonL.style.color='#CCCCCC';
-                    
-                    // Add onClick events
-                    this.$buttonL.addEventListener('click', () => {
-                        let week = parseInt(this.week);
-                        if ( week > 0) {
-                            week -= 1;
-                            this.week = String(week);
-                            if (week == 0) this.$buttonL.style.color='#CCCCCC';
-                        }
-                    });
-                    this.$buttonR.addEventListener('click', () => {
-                        let week = parseInt(this.week);
-                        week += 1;
-                        this.week = String(week);
-                        this.$buttonL.style.color='#000000';
-                        
-                    });
-                });
-    
-            });
         }
         
         get week(){
@@ -87,9 +53,6 @@
             this._props.week = newVal;
             // When week is changed then propagate to sub-components
             this.shadowRoot.querySelectorAll('dp-date').forEach(node => {
-                //node.setAttribute('week', parseInt(newVal));
-                console.log({node});
-                //debugger;
                 node.currentWeek=parseInt(newVal);
             });
         }
@@ -107,8 +70,38 @@
                 else this[name] = newVal;
             }
         }
-                
-        loadSubs (){
+        
+        // Synchronously load all dependencies (add to document head) then build component
+        loadSub(scripts,baseURL) {
+            if (scripts.length){
+                const file = scripts.shift();
+                const tagAttr = {
+                    src: `${baseURL}/${file}.js?`,
+                    //type: '',
+                    onerror: () => {
+                        console.warn(`script load error: ${file}`);
+                    }
+                }
+
+                if (scripts.length) {
+                    // If there are more scripts then run this function again after current dependancy has loaded
+                    tagAttr.onload = () => {
+                        console.log(`script dependency loaded: ${file}`);
+                        this.loadSub(scripts,baseURL);
+                    }
+                } else {
+                    // If this is the last dependancy then schedule building of the component once depency loaded
+                    tagAttr.onload = () => {
+                        console.log(`script dependency loaded: ${file}`);
+                        this.buildComp();
+                    }
+                }
+                document.head.append(Object.assign(document.createElement('script'),tagAttr));    
+            }
+        }
+        
+        // Define where dependencies are found and trigger synchronous loading
+        loadSubs () {
             // ### Load sub-components ###
             // Determine URL where sub-components can be found (assumes they live with main component)
             const compURL=document.head.querySelector("script[src$='datepicker.js']").src
@@ -120,22 +113,38 @@
                 'datepicker-date'
             ];
             
-            // Load script files by adding <script> nodes to <head>
-            while (scripts.length){
-                const file = scripts.shift();
-                const tagAttr = {
-                    src: `${baseURL}/${file}.js?`,
-                    //type: '',
-                    onerror: () => {
-                        console.warn(`script load error: ${file}`);
-                    },
-                    onload: () => {
-                        console.log(`script dependency loaded: ${file}`);
-                    }
+            this.loadSub(scripts,baseURL);
+        }
+        
+        // The 'normal' Contructor() content for this component
+        buildComp() {
+            this.attachShadow({ mode: 'open' }).append(template.content.cloneNode(true));
+            this._props = {}; // Object to hold shadow properties for properties with setters
+            this.week = '0';
+            
+            // Get button nodes
+            this.$buttonL = this.shadowRoot.querySelector("#al");
+            this.$buttonR = this.shadowRoot.querySelector("#ar");
+            
+            // Initalise left button to grey
+            this.$buttonL.style.color='#CCCCCC';
+            
+            // Add onClick events
+            this.$buttonL.addEventListener('click', () => {
+                let week = parseInt(this.week);
+                if ( week > 0) {
+                    week -= 1;
+                    this.week = String(week);
+                    if (week == 0) this.$buttonL.style.color='#CCCCCC';
                 }
-                document.head.append(Object.assign(document.createElement('script'),tagAttr));    
+            });
+            this.$buttonR.addEventListener('click', () => {
+                let week = parseInt(this.week);
+                week += 1;
+                this.week = String(week);
+                this.$buttonL.style.color='#000000';
                 
-            }    
+            });
         }
         
     });

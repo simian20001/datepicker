@@ -32,7 +32,6 @@
     customElements.define('dp-date',
     class extends HTMLElement {
         constructor() {
-            console.log('contructing dp-date');
             // Apply template HTML
             super().append(template.content.cloneNode(true));
             // Object to hold shadow properties for properties with setters
@@ -50,7 +49,6 @@
         }
         
         set currentWeek(newVal){
-            console.log('setter fired');
             this._props.week = newVal;
             this.render();
         }

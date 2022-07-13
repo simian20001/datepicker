@@ -13,7 +13,7 @@
         vertical-align: middle;
         border: 1px solid black;
     }
-
+    
     .day {
         font-size: 40px;
         font-weight: bold;
@@ -36,29 +36,29 @@
             super().append(template.content.cloneNode(true));
             // Object to hold shadow properties for properties with setters
             this._props = { week: 0 }; 
+            this.week = 0;
             
             // Determine day string for this instance from 'id' attribute
             const days=['Ma','Di','Wo','Do','Vr'];
+            // Set text for each day based on id of element
             this.querySelector('.day').innerHTML = (this.id?days[parseInt(this.id)-1]:'ERROR');
-            this.render();            
-        }
-        
-        // Handle property/attribute mirroring
-        get currentWeek(){
-            return this._props.week;
-        }
-        
-        set currentWeek(newVal){
-            this._props.week = newVal;
             this.render();
+
+            // Listen for events on the Event Bus (parent node)
+            this.parentNode.addEventListener('changeWeek', (e) => {
+                this.week += e.detail.change;
+                if (this.week < 0) this.week = 0;
+                this.render();
+            });            
         }
         
         render (){
+            // Determine today
             const today = new Date();
             // Render date in grey if date has already passed else black
-            this.querySelector('.datebox').style.color = (parseInt(this.currentWeek) === 0 && (today.getDay() > (parseInt(this.id)))) ? "#CCCCCC" : "#000000";
+            this.querySelector('.datebox').style.color = (parseInt(this.week) === 0 && (today.getDay() > (parseInt(this.id)))) ? "#CCCCCC" : "#000000";
             // Modify "today" to the correct day for the button, handling month boundary if required
-            today.setDate(today.getDate()+(7*this.currentWeek)+(parseInt(this.id)-today.getDay()));
+            today.setDate(today.getDate()+(7*this.week)+(parseInt(this.id)-today.getDay()));
             // Render date
             this.querySelector('.date').innerHTML = `${today.getDate()} ${this.get_month(today.getMonth())}`    
         }

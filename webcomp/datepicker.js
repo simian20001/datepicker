@@ -43,92 +43,66 @@
         constructor() {
             super()
             // Synchonously load dependencies.  Rest of contructor now in buildComp()
-            this.loadSubs();
+            this.loadDependancies();
         }
-        
-        get week(){
-            if (this._props.week) return this._props.week;
-        }
-        
-        set week(newVal){
-            this._props.week = newVal;
-            // When week is changed then propagate to sub-components
-            this.shadowRoot.querySelectorAll('dp-date').forEach(node => {
-                node.currentWeek=parseInt(newVal);
-            });
-        }
-        
-        // Synchronously load all dependencies (add to document head) then build component
-        loadSub(scripts,baseURL) {
-            if (scripts.length){
-                const file = scripts.shift();
-                const tagAttr = {
-                    src: `${baseURL}/${file}.js?`,
-                    onerror: () => {
-                        console.warn(`script load error: ${file}`);
-                    },
-                    onload: () => {
-                        this.loadSub(scripts,baseURL);
-                    }
-                }
-                // Is this the last dependency?
-                if (!scripts.length) {
-                    // Build component after this
-                    tagAttr.onload = () => this.buildComp();
-                }
-                document.head.append(Object.assign(document.createElement('script'),tagAttr));    
-            }
-        }
-        
+                
         // Define where dependencies are found and trigger synchronous loading
-        loadSubs () {
-            // ### Load sub-components ###
-            // Determine URL where sub-components can be found (assumes they live with main component)
-            const compURL=document.head.querySelector("script[src$='datepicker.js']").src
-            const baseURL=compURL.substring(0,compURL.indexOf('/datepicker.js'));
-            
-            // Provide list of sub-component files to load
+        loadDependancies () {
+            // List of dependancies to load
             const scripts=[
                 'datepicker-arrow',
                 'datepicker-date'
             ];
+
+            // Determine URL of dependacies - assumes they can be found at same location as this component
+            const compURL=document.head.querySelector("script[src$='datepicker.js']").src
+            const baseURL=compURL.substring(0,compURL.indexOf('datepicker.js'));
             
-            this.loadSub(scripts,baseURL);
+            // Convert array of dependancy names to an array of full paths
+            scripts.forEach((item,index,arr) => {arr[index]=`${baseURL}${item}.js`});
+
+            // initiate the loading process
+            this.loadNextDependancy(scripts);
+        }
+        
+        // Load a depndancy and sequence next action
+        loadNextDependancy(scripts) {
+            // Check that an array with at least one dependancy has been passed
+            if (!scripts.length) {
+                console.log('Failed to load dependancies.');
+                return;
+            }
+            // Pop an element from the array (array length reduced by one)
+            const file = scripts.shift();
+            // Define the script to load plus onError event
+            const tagAttr = {
+                src: `${file}`,
+                onerror: () => {
+                    console.warn(`script load error: ${file}`);
+                }
+            }
+            // Once this dependancy is loaded then schedule next else continue contructor of this component
+            tagAttr.onload = (scripts.length ? () => this.loadNextDependancy(scripts) : () => this.buildComp());
+            // Trigger dependancy loading by adding to document.head
+            document.head.append(Object.assign(document.createElement('script'),tagAttr));    
         }
         
         // The 'normal' Contructor() content for this component
         buildComp() {
             this.attachShadow({ mode: 'open' }).append(template.content.cloneNode(true));
-            this._props = {}; // Object to hold shadow properties for properties with setters
-            this.week = '0';
-
+            
             // Define custom events            
-            const decWeek = new CustomEvent('changeWeek',{detail: {change: -1}});//,bubble: true}});
+            const decWeek = new CustomEvent('changeWeek',{detail: {change: -1}});
             const incWeek = new CustomEvent('changeWeek',{detail: {change: 1}});
-                        
+            
             // Set useful nodes
             const $eventBus = this.shadowRoot.querySelector('#container')
             const $buttonL = this.shadowRoot.querySelector('#al');
             const $buttonR = this.shadowRoot.querySelector('#ar');
-
-            // Debug event
-            //$eventBus.addEventListener('changeWeek',(e)=>console.log(e.detail.change));
-
-            // Add onClick events
-            $buttonL.addEventListener('click', () => {
-                $eventBus.dispatchEvent(decWeek);
-                let week = parseInt(this.week);
-                if ( week > 0) {
-                    week -= 1;
-                    this.week = String(week);
-                }
-            });
-            $buttonR.addEventListener('click', () => {
-                $eventBus.dispatchEvent(incWeek);
-                let week = parseInt(this.week);
-                week += 1;
-                this.week = String(week);                
-            });
+            
+            // Add onClick events to arrows to send a custom event to Event Bus
+            $buttonL.addEventListener('click', () => { $eventBus.dispatchEvent(decWeek); });
+            $buttonR.addEventListener('click', () => { $eventBus.dispatchEvent(incWeek); });
         }
         
     });

@@ -30,12 +30,13 @@
             // Set initial colour
             this.week=0
             this.render();
+
+            // Listen for events on the Event Bus (parent node)
             this.parentNode.addEventListener('changeWeek', (e) => {
                 this.week += e.detail.change;
                 if (this.week < 0) this.week = 0;
                 this.render();
-            }
-            );
+            });
         }
         
         render() {

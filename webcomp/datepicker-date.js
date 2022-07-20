@@ -34,33 +34,50 @@
         constructor() {
             // Apply template HTML
             super().append(template.content.cloneNode(true));
-            // Object to hold shadow properties for properties with setters
-            this._props = { week: 0 }; 
+            // Initialise value of 'week'
             this.week = 0;
+            
+            // Nodes of interest
+            this.$day = this.querySelector('.day');
+            this.$datebox = this.querySelector('.datebox');
             
             // Determine day string for this instance from 'id' attribute
             const days=['Ma','Di','Wo','Do','Vr'];
             // Set text for each day based on id of element
-            this.querySelector('.day').innerHTML = (this.id?days[parseInt(this.id)-1]:'ERROR');
+            this.$day.innerHTML = (this.id?days[parseInt(this.id)-1]:'ERROR');
             this.render();
-
-            // Listen for events on the Event Bus (parent node)
+            
+            // Add listener for events on the Event Bus (parent node)
             this.parentNode.addEventListener('changeWeek', (e) => {
                 this.week += e.detail.change;
                 if (this.week < 0) this.week = 0;
                 this.render();
             });            
+
+            // Add listener for onClick and dispatch an event that can be detected outside the shadow root
+            this.$datebox.addEventListener('click', () => {
+                // Only send date if this date is in the future
+                if (this.$datebox.style.color === 'rgb(0, 0, 0)') {
+                    const datepicked = new CustomEvent('datepicked',{composed: true, detail: {date: this.$date,month: this.$month}});
+                    this.dispatchEvent(datepicked);
+                }
+            });
+            
         }
         
         render (){
             // Determine today
             const today = new Date();
             // Render date in grey if date has already passed else black
-            this.querySelector('.datebox').style.color = (parseInt(this.week) === 0 && (today.getDay() > (parseInt(this.id)))) ? "#CCCCCC" : "#000000";
+            //            this.querySelector('.datebox').style.color = (parseInt(this.week) === 0 && (today.getDay() > (parseInt(this.id)))) ? "#CCCCCC" : "#000000";
+            this.$datebox.style.color = (parseInt(this.week) === 0 && (today.getDay() > (parseInt(this.id)))) ? "#CCCCCC" : "#000000";
             // Modify "today" to the correct day for the button, handling month boundary if required
             today.setDate(today.getDate()+(7*this.week)+(parseInt(this.id)-today.getDay()));
+            // Store day & date as properties for easy extraction later
+            this.$date = today.getDate();
+            this.$month = today.getMonth();
             // Render date
-            this.querySelector('.date').innerHTML = `${today.getDate()} ${this.get_month(today.getMonth())}`    
+            this.querySelector('.date').innerHTML = `${this.$date} ${this.get_month(this.$month)}`    
         }
         
         get_month (month) {

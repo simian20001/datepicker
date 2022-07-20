@@ -10,7 +10,7 @@
         min-width: 50px;
         text-align: center;
         padding: 8px;
-        border: 1px solid red;
+        border: none;
         vertical-align: middle;
         font-size: 40px;
     }

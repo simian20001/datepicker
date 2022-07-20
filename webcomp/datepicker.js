@@ -12,8 +12,7 @@
     #container {
         display: inline-block;
         font-family: Candara, Calibri, Segoe, Segoe UI, Optima, Arial, sans-serif;
-        border-style: solid;
-        border-color: red;
+        border: none;
         font-size: 0;
     }
     

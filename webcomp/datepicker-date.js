@@ -1,8 +1,8 @@
-/* Define the Main Date-Picker Element */
+/* Define the Date-Picker Date component */
 (function(){
     const template = document.createElement('template');
     
-    // Date Picker Main Element
+    // Date Box HTML
     template.innerHTML = `
     <style>
     .datebox {
@@ -29,61 +29,62 @@
     <div class="date"></div>
     </div>`
     
-    customElements.define('dp-date',
+    // picker-date custom element definition
+    customElements.define('picker-date',
     class extends HTMLElement {
         constructor() {
             // Apply template HTML
             super().append(template.content.cloneNode(true));
-            // Initialise value of 'week'
+            
+            // Initialise local component properties
             this.week = 0;
+            this.$date = 0;
+            this.$month = 0;
+            this.$months = ['jan','feb','mrt','apr','mei','juni','juli','aug','sep','okt','nov','dec'];
             
             // Nodes of interest
             this.$day = this.querySelector('.day');
             this.$datebox = this.querySelector('.datebox');
             
-            // Determine day string for this instance from 'id' attribute
+            // Determine day string for this instance from component 'id' attribute
             const days=['Ma','Di','Wo','Do','Vr'];
-            // Set text for each day based on id of element
             this.$day.innerHTML = (this.id?days[parseInt(this.id)-1]:'ERROR');
+            // Calculate correct starting text
             this.render();
             
             // Add listener for events on the Event Bus (parent node)
             this.parentNode.addEventListener('changeWeek', (e) => {
+                // Recover week change value from event detail
                 this.week += e.detail.change;
+                // Limit lowest value to zero
                 if (this.week < 0) this.week = 0;
+                // Recalculate text fields
                 this.render();
             });            
-
+            
             // Add listener for onClick and dispatch an event that can be detected outside the shadow root
             this.$datebox.addEventListener('click', () => {
-                // Only send date if this date is in the future
+                // Only dispatch event if the current date for this component is in the future (not greyed out in the UI)
                 if (this.$datebox.style.color === 'rgb(0, 0, 0)') {
                     const datepicked = new CustomEvent('datepicked',{composed: true, detail: {date: this.$date,month: this.$month}});
                     this.dispatchEvent(datepicked);
                 }
             });
-            
         }
         
+        // Calculate the correct text for this component
         render (){
-            // Determine today
+            // Determine today's date
             const today = new Date();
             // Render date in grey if date has already passed else black
-            //            this.querySelector('.datebox').style.color = (parseInt(this.week) === 0 && (today.getDay() > (parseInt(this.id)))) ? "#CCCCCC" : "#000000";
             this.$datebox.style.color = (parseInt(this.week) === 0 && (today.getDay() > (parseInt(this.id)))) ? "#CCCCCC" : "#000000";
-            // Modify "today" to the correct day for the button, handling month boundary if required
+            // Modify "today" to the correct date for the button, handling month boundary when required
             today.setDate(today.getDate()+(7*this.week)+(parseInt(this.id)-today.getDay()));
-            // Store day & date as properties for easy extraction later
+            // Update day & date properties
             this.$date = today.getDate();
             this.$month = today.getMonth();
             // Render date
-            this.querySelector('.date').innerHTML = `${this.$date} ${this.get_month(this.$month)}`    
+            this.querySelector('.date').innerHTML = `${this.$date} ${this.$months[this.$month]}`    
         }
-        
-        get_month (month) {
-            //Convert month number to abbreviated text
-            const months=['jan','feb','mrt','apr','mei','juni','juli','aug','sep','okt','nov','dec'];
-            return months[month];
-        }   
     });
 }) ();

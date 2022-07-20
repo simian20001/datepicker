@@ -1,4 +1,4 @@
-/* Define the Main Date-Picker Element */
+/* Define the Date-Picker Arrow component */
 (function(){
     const template = document.createElement('template');
     

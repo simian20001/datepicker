@@ -2,8 +2,9 @@
 (function(){
     const template = document.createElement('template');
     
-    // Date Picker Main Element
+    // Component HTML
     template.innerHTML = `
+    <!-- Style Definition -->
     <style>
     .arrowbox {
         display: inline-block;
@@ -16,9 +17,11 @@
     }
     </style>
     
+    <!-- Layout Definition -->
     <div class="arrowbox"></div>`
     
-    customElements.define('dp-arrow',
+    // Define custom element
+    customElements.define('picker-arrow',
     class extends HTMLElement {
         constructor() {
             super().append(template.content.cloneNode(true));

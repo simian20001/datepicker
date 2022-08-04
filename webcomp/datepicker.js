@@ -1,7 +1,7 @@
-/* Define the Main Date-Picker Element */
+/* Define the Main Date-Picker Component */
 (function(){
     
-    // Date Picker Element HTML
+    // Component HTML
     const template = document.createElement('template');
     template.innerHTML = `
     <!-- Style Definition -->
@@ -12,29 +12,20 @@
         border: none;
         font-size: 0;
     }
-    
-    .g-item {
-        display: inline-block;
-        min-width: 50px;
-        text-align: center;
-        padding: 8px;
-        border: 1px solid blue;
-        vertical-align: middle;
-    }
     </style>
     
     <!-- Layout Definition -->
     <div id="container">
-    <dp-arrow id="al"></dp-arrow>
-    <picker-date id="1"></picker-date>
-    <picker-date id="2"></picker-date>
-    <picker-date id="3"></picker-date>
-    <picker-date id="4"></picker-date>
-    <picker-date id="5"></picker-date>
-    <dp-arrow id="ar"></dp-arrow>
+        <picker-arrow id="al"></picker-arrow>
+        <picker-date id="1"></picker-date>
+        <picker-date id="2"></picker-date>
+        <picker-date id="3"></picker-date>
+        <picker-date id="4"></picker-date>
+        <picker-date id="5"></picker-date>
+        <picker-arrow id="ar"></picker-arrow>
     </div>`
     
-    // Date Picker custom element definition
+    // Define custom element
     customElements.define('date-picker',
     class extends HTMLElement {
         constructor() {
@@ -51,7 +42,7 @@
                 'datepicker-arrow',
                 'datepicker-date'
             ];
-            // Determine URL of dependacies - assumes they can be found at same location as the main component
+            // Determine URL of dependacies - assumes they are stored at same location as the main component
             const compURL=document.head.querySelector("script[src$='datepicker.js']").src
             const baseURL=compURL.substring(0,compURL.indexOf('datepicker.js'));
             // Convert array of dependency names to full paths
@@ -77,13 +68,13 @@
                 }
             }
             // Define an onLoad event for the HTMLElement.  
-            // If array is empty then schedule rest of contructor else schedule loading of next dependency
+            //  If array is now empty then schedule rest of contructor() content else schedule loading of next dependency
             tagAttr.onload = (scripts.length ? () => this.loadNextDependancy(scripts) : () => this.buildComp());
-            // Trigger dependency loading by adding HTMLElement to document.head
+            // Trigger dependency loading by appending HTMLElement to document.head
             document.head.append(Object.assign(document.createElement('script'),tagAttr));    
         }
         
-        // The 'normal' Contructor() content for this component
+        // Content that would normally be in contructor() but needs to run AFTER sub-components have loaded
         buildComp() {
             this.attachShadow({ mode: 'open' }).append(template.content.cloneNode(true));
             
@@ -91,14 +82,14 @@
             const decWeek = new CustomEvent('changeWeek',{detail: {change: -1}});
             const incWeek = new CustomEvent('changeWeek',{detail: {change: 1}});
             
-            // Set useful nodes
-            const $eventBus = this.shadowRoot.querySelector('#container')
-            const $buttonL = this.shadowRoot.querySelector('#al');
-            const $buttonR = this.shadowRoot.querySelector('#ar');
+            // Identify useful nodes
+            const $_eventBus = this.shadowRoot.querySelector('#container')
+            const $_buttonL = this.shadowRoot.querySelector('#al');
+            const $_buttonR = this.shadowRoot.querySelector('#ar');
             
             // Add onClick events to arrows to send a custom event to Event Bus
-            $buttonL.addEventListener('click', () => { $eventBus.dispatchEvent(decWeek); });
-            $buttonR.addEventListener('click', () => { $eventBus.dispatchEvent(incWeek); });
+            $_buttonL.addEventListener('click', () => { $_eventBus.dispatchEvent(decWeek); });
+            $_buttonR.addEventListener('click', () => { $_eventBus.dispatchEvent(incWeek); });
         }
     });
 }) ();

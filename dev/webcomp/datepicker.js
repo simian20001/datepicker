@@ -1,7 +1,7 @@
 /* Define the Main Date-Picker Component */
 (function(){
     
-    // Component HTML something
+    // Component HTML
     const template = document.createElement('template');
     template.innerHTML = `
     <!-- Style Definition -->

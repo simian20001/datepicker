@@ -16,13 +16,13 @@
     
     <!-- Layout Definition -->
     <div id="container">
-        <picker-arrow id="l">&nbsp;&lt;&nbsp;</picker-arrow>
+        <picker-arrow id="al"></picker-arrow>
         <picker-date id="1"></picker-date>
         <picker-date id="2"></picker-date>
         <picker-date id="3"></picker-date>
         <picker-date id="4"></picker-date>
         <picker-date id="5"></picker-date>
-        <picker-arrow id="r">&nbsp;&gt;&nbsp;</picker-arrow>
+        <picker-arrow id="ar"></picker-arrow>
     </div>`
     
     // Define custom element

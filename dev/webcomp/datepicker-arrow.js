@@ -29,7 +29,7 @@
         
         connectedCallback() {
             // Set arrow text           
-            //this.querySelector('.arrowbox').innerHTML = `&nbsp;${this.id === 'al'?'&lt;':'&gt;'}&nbsp;`;
+            this.querySelector('.arrowbox').innerHTML = `&nbsp;${this.id === 'al'?'&lt;':'&gt;'}&nbsp;`;
             // Set initial colour
             this.week=0
             this.render();

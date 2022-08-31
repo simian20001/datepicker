@@ -39,7 +39,7 @@
             super().append(template.content.cloneNode(true));
             
             // Define names for days and months
-            const days = ['ma','di','wo','do','vr','za','zo'];
+            const days = ['zo','ma','di','wo','do','vr','za'];
             const months =  ['jan','feb','mrt','apr','mei','juni','juli','aug','sep','okt','nov','dec'];
 
             // Initialise local properties
@@ -54,7 +54,7 @@
             this.$_datebox = this.querySelector('.datebox');
             
             // Determine day string for this instance, using 'id' attribute
-            this.$_day.innerHTML = (this.id?days[parseInt(this.id)-1]:'ERROR');
+            this.$_day.innerHTML = (this.id?days[parseInt(this.id)]:'ERROR');
             // Calculate correct starting date text and text colour
             this.render();
             
@@ -88,8 +88,10 @@
             // Determine today's date
             const today = new Date();
 
-            // Determine if this date is a vlaid choice, ie has day passed?
-            this.$dateValid = (parseInt(this.$week) === 0 && (today.getDay() > (parseInt(this.id)))) ? false : true;
+            // Determine if this date is a valid choice, ie has day passed?
+            const id = parseInt(this.id);
+            if (id === 0 || id === 6) this.$dateValid = false;
+            else this.$dateValid = (parseInt(this.$week) === 0 && (today.getDay() > (parseInt(this.id)))) ? false : true;
             // Render date in grey if not valid
             this.$_datebox.style.color = (this.$dateValid ? "#000000" : "#CCCCCC");
 

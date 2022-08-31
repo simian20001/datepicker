@@ -31,19 +31,26 @@
             // Set arrow text           
             this.querySelector('.arrowbox').innerHTML = `&nbsp;${this.id === 'al'?'&lt;':'&gt;'}&nbsp;`;
             // Set initial colour
-            this.week=0
+            this.$week = 0;
             this.render();
 
             // Listen for events on the Event Bus (parent node)
             this.parentNode.addEventListener('changeWeek', (e) => {
-                this.week += e.detail.change;
-                if (this.week < 0) this.week = 0;
+                // First time an arrow is pressed, pull value of $maxWeek from parentNode.
+                //  It should be defined by the time the user is interacting with UI
+                if (!this.$maxWeek) this.$maxWeek = this.parentNode.$maxWeek;
+
+                // Modify the week value, respecting limits
+                this.$week += e.detail.change;
+                if (this.$week < 0) this.$week = 0;
+                if (this.$week > this.$maxWeek) this.$week = this.$maxWeek;
                 this.render();
             });
         }
         
         render() {
-            this.style.color = (this.id === 'al' && this.week === 0) ? '#CCCCCC' : '#000000';
+            // Change the colour of the arrows to reflect limits
+            this.style.color = ((this.id === 'al' && this.$week === 0) || (this.id === 'ar' && this.$week === this.$maxWeek)) ? '#CCCCCC' : '#000000';
         }
         
         

@@ -38,7 +38,6 @@
             this.parentNode.addEventListener('changeWeek', (e) => {
                 this.week += e.detail.change;
                 if (this.week < 0) this.week = 0;
-                if (this.week > 4) this.week = 4;
                 this.render();
             });
         }

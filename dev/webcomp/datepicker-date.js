@@ -68,6 +68,7 @@
                 this.$week += e.detail.change;
                 // Limit lowest value to zero
                 if (this.$week < 0) this.$week = 0;
+                if (this.$week > 4) this.$week = 4;
                 // Recalculate text fields
                 this.render();
             });            

@@ -87,7 +87,7 @@
             const $_buttonR = this.shadowRoot.querySelector('#ar');
             
             // Set default value(s) if attribute(s) not specified
-            $_eventBus.$maxWeek = this.hasAttribute('maxweek')?parseInt(this.getAttribute('maxweek')):4;
+            $_eventBus.$maxWeek = this.hasAttribute('maxweek')?(parseInt(this.getAttribute('maxweek'))-1):4;
             
             // Add onClick events to arrows to send a custom event to Event Bus
             $_buttonL.addEventListener('click', () => { $_eventBus.dispatchEvent(decWeek); });

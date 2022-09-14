@@ -16,15 +16,15 @@
     
     <!-- Layout Definition -->
     <div id="container">
-        <picker-arrow id="al"></picker-arrow>
-        <picker-date id="0"></picker-date>
-        <picker-date id="1"></picker-date>
-        <picker-date id="2"></picker-date>
-        <picker-date id="3"></picker-date>
-        <picker-date id="4"></picker-date>
-        <picker-date id="5"></picker-date>
-        <picker-date id="6"></picker-date>
-        <picker-arrow id="ar"></picker-arrow>
+    <picker-arrow id="al"></picker-arrow>
+    <picker-date id="0"></picker-date>
+    <picker-date id="1"></picker-date>
+    <picker-date id="2"></picker-date>
+    <picker-date id="3"></picker-date>
+    <picker-date id="4"></picker-date>
+    <picker-date id="5"></picker-date>
+    <picker-date id="6"></picker-date>
+    <picker-arrow id="ar"></picker-arrow>
     </div>`
     
     // Define custom element
@@ -32,13 +32,8 @@
     class extends HTMLElement {
         constructor() {
             super()
-            // Synchonously load dependencies.
-            this.loadDependancies();
-            // Rest of contructor now in buildComp() function and occurs after last dependency has loaded
-        }
-        
-        // Define where dependencies are found and trigger synchronous loading
-        loadDependancies () {
+
+            // ### Synchonously load dependencies ###
             // List of dependencies to load
             const scripts=[
                 'datepicker-arrow',
@@ -51,8 +46,10 @@
             scripts.forEach((item,index,arr) => {arr[index]=`${baseURL}${item}.js`});
             // Start the loading process
             this.loadNextDependancy(scripts);
+            
+            // ### Rest of contructor can be found in buildComp() function and occurs after last dependency has loaded ###
         }
-        
+                
         // Load a dependency and sequence next action
         loadNextDependancy(scripts) {
             // Check that an array with at least one dependency has been passed
@@ -89,7 +86,7 @@
             const $_buttonL = this.shadowRoot.querySelector('#al');
             const $_buttonR = this.shadowRoot.querySelector('#ar');
             
-            // Set default value if attribute not specified
+            // Set default value(s) if attribute(s) not specified
             $_eventBus.$maxWeek = this.hasAttribute('maxweek')?parseInt(this.getAttribute('maxweek')):4;
             
             // Add onClick events to arrows to send a custom event to Event Bus
